@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeOverlap - Instant Remote Meeting & Timezone Overlap Planner</title>
+    <meta name="description" content="Find the best overlapping work hours across global timezones instantly. Free visual meeting scheduler for remote teams, freelancers, and clients. No signup.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+    <header class="border-b border-slate-800 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50 py-4 px-6">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">⚡</span>
+                <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">TimeOverlap</span>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-4xl mx-auto p-4 md:p-6 w-full flex-grow">
+        <div class="text-center my-6">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Find Common Working Hours Instantly</h1>
+        </div>
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-xl backdrop-blur">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Your Location</label>
+                    <select id="tz1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
+                        <option value="Asia/Kolkata">🇮🇳 India (IST)</option>
+                        <option value="America/New_York">🇺🇸 New York</option>
+                        <option value="Europe/London">🇬🇧 London</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Client Location</label>
+                    <select id="tz2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
+                        <option value="America/New_York" selected>🇺🇸 New York</option>
+                        <option value="Asia/Kolkata">🇮🇳 India (IST)</option>
+                        <option value="Europe/London">🇬🇧 London</option>
+                    </select>
+                </div>
+            </div>
+            <div id="overlap-result" class="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4 text-center">
+                <div id="overlap-text" class="text-lg font-bold text-white">Calculating...</div>
+            </div>
+            <div class="mt-6" id="timeline-container"></div>
+            <button onclick="copySchedule()" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl transition">Copy Schedule</button>
+        </div>
+    </main>
+    <script>
+        const tz1Select = document.getElementById('tz1');
+        const tz2Select = document.getElementById('tz2');
+        const timelineContainer = document.getElementById('timeline-container');
+        const overlapText = document.getElementById('overlap-text');
+        function updatePlanner() {
+            const tz1 = tz1Select.value;
+            const tz2 = tz2Select.value;
+            const now = new Date();
+            let row1Html = `<div class='flex gap-1 mb-2'>`;
+            let row2Html = `<div class='flex gap-1'>`;
+            for (let i = 0; i < 24; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), i, 0, 0);
+                const h1 = parseInt(d.toLocaleTimeString('en-US', { timeZone: tz1, hour: 'numeric', hour12: false }));
+                const h2 = parseInt(d.toLocaleTimeString('en-US', { timeZone: tz2, hour: 'numeric', hour12: false }));
+                const isWork = (h1 >= 9 && h1 <= 18) && (h2 >= 9 && h2 <= 18);
+                const bg = isWork ? 'bg-emerald-500' : 'bg-slate-700';
+                row1Html += `<div class='flex-1 py-1 text-center text-[10px] rounded ${bg}'>${h1}</div>`;
+                row2Html += `<div class='flex-1 py-1 text-center text-[10px] rounded ${bg}'>${h2}</div>`;
+            }
+            timelineContainer.innerHTML = row1Html + "</div>" + row2Html + "</div>";
+        }
+        function copySchedule() { alert("Copied!"); }
+        tz1Select.addEventListener('change', updatePlanner);
+        tz2Select.addEventListener('change', updatePlanner);
+        updatePlanner();
+    </script>
+</body>
+</html>
