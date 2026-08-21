@@ -430,20 +430,19 @@
         let slotScore = 100;
 
         state.participants.forEach(p => {
-          const startMin = getLocalMinutes(startUtc, p.zone);
-
           if (!isWithinWorkingWindow(startUtc, endUtc, p)) {
             allAvailable = false;
           }
-
-          if (startMin < 8 * 60 || startMin >= 20 * 60) slotScore -= 20;
-          if (startMin < 6 * 60 || startMin >= 22 * 60) slotScore -= 40;
         });
 
         if (allAvailable) {
           const p1Min = getLocalMinutes(startUtc, state.participants[0].zone);
           const targetCenter = (prefS + prefE) / 2;
-          slotScore -= Math.abs(p1Min - targetCenter) * 0.03;
+          
+          // Clean dynamic scoring based strictly on configured Preferred Bounds
+          slotScore -= Math.abs(p1Min - targetCenter) * 0.05;
+          if (p1Min < prefS || p1Min >= prefE) slotScore -= 30;
+
           candidateSlots.push({ startUtc, endUtc, score: slotScore });
         }
       }
@@ -500,14 +499,10 @@
         html += `<div class="pr-2 py-2 truncate"><div class="font-semibold text-xs truncate text-slate-200">${escapeHtml(p.name)}</div><div class="text-[10px] text-slate-500 truncate">${escapeHtml(p.zone.split('/')[1] || p.zone)}</div></div>`;
         for (let h = 0; h < 24; h++) {
           const utc = new Date(Date.UTC(...dateStr.split('-').map(Number).map((v, i) => i === 1 ? v - 1 : v), h, 0, 0));
-          const local = getLocalDateTimeParts(utc, p.zone);
-          const localMin = local.hour * 60 + local.minute;
-          const isWork = localMin >= p.start * 60 && localMin < p.end * 60;
-          const isOverlap = state.participants.every(x => {
-            const xLocal = getLocalDateTimeParts(utc, x.zone);
-            const xMin = xLocal.hour * 60 + xLocal.minute;
-            return xMin >= x.start * 60 && xMin < x.end * 60;
-          });
+          const utcEnd = new Date(utc.getTime() + 60 * 60000);
+
+          const isWork = isWithinWorkingWindow(utc, utcEnd, p);
+          const isOverlap = state.participants.every(x => isWithinWorkingWindow(utc, utcEnd, x));
 
           const cls = isOverlap
             ? "bg-brand-500 text-slate-950 font-bold"
