@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="google-site-verification" content="Pl9iq3h4Y-5LzkBll4F1PdcA_s5vTwuP1MA5Cl9v63g" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TimeOverlap - Global Remote Meeting & Timezone Overlap Planner</title>
-  <meta name="description" content="Calculate common working hours across global timezones instantly. Free visual overlap tool for remote teams, freelancers, and clients worldwide." />
+  <meta name="google-site-verification" content="Pl9iq3h4Y-5LzkBll4F1PdcA_s5vTwuP1MA5Cl9v63g" />
+  <meta name="description" content="Calculate real-time multi-timezone overlap for distributed teams. Date-aware DST converter, custom working hours, and calendar export." />
+  <meta name="theme-color" content="#020617" />
+  <meta property="og:title" content="TimeOverlap Pro — Smart Global Team Meeting Planner" />
+  <meta property="og:description" content="Find the best shared meeting window across global time zones instantly." />
+  <meta property="og:type" content="website" />
+  <title>TimeOverlap Pro — Smart Global Team Meeting Planner</title>
 
   <!-- Google tag (gtag.js) - Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-63CJ1KW5CK"></script>
@@ -13,262 +17,383 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-63CJ1KW5CK');
   </script>
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#34d399', 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: #020617; }
+    select, input { color-scheme: dark; }
+    .glass { background: rgba(15,23,42,.85); backdrop-filter: blur(16px); }
+    .timeline-grid { display: grid; grid-template-columns: 140px repeat(24, minmax(36px, 1fr)); min-width: 1040px; }
+    .scrollbar::-webkit-scrollbar { height: 6px; }
+    .scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+    @media(max-width: 640px) { .timeline-grid { grid-template-columns: 100px repeat(24, minmax(32px, 1fr)); } }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
-  <!-- Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 py-4 px-6">
-    <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-2">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between font-sans antialiased">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-slate-800 glass py-3 px-4 sm:px-6">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="#" class="flex items-center gap-2">
         <span class="text-2xl">⚡</span>
-        <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">TimeOverlap</span>
+        <span class="text-xl font-black bg-gradient-to-r from-blue-400 via-teal-300 to-brand-400 bg-clip-text text-transparent">TimeOverlap</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a 
+          href="https://wise.prf.hn/click/camref:1101l436282/destination:https%3A%2F%2Fwise.com%2F" 
+          target="_blank" 
+          rel="noopener noreferrer sponsored"
+          onclick="trackAffiliateClick('Wise Header')"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs font-bold transition shadow-sm"
+        >
+          <span>Pay Global Team (Wise)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
       </div>
-      <a href="#popular-pairs" class="text-sm font-medium text-slate-400 hover:text-white transition">Popular Guides</a>
     </div>
   </header>
 
-  <!-- Main Planner Section -->
-  <main class="max-w-4xl mx-auto p-4 md:p-6 w-full flex-grow">
-    <div class="text-center my-6">
-      <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">Find Common Working Hours Instantly</h1>
-      <p class="text-slate-400 mt-2 text-sm md:text-base">Calculate perfect overlap times between your local timezone and global clients.</p>
-    </div>
-
-    <!-- Tool Card -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-8 shadow-2xl backdrop-blur-md">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Your Location</label>
-          <select id="tz1" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3.5 text-white focus:outline-none focus:border-blue-500">
-            <option value="Asia/Kolkata">🇮🇳 India (IST)</option>
-            <option value="America/New_York">🇺🇸 New York (EST/EDT)</option>
-            <option value="America/Los_Angeles">🇺🇸 San Francisco (PST/PDT)</option>
-            <option value="America/Chicago">🇺🇸 Chicago (CST/CDT)</option>
-            <option value="America/Toronto">🇨🇦 Toronto (EST)</option>
-            <option value="America/Vancouver">🇨🇦 Vancouver (PST)</option>
-            <option value="Europe/London">🇬🇧 London (GMT/BST)</option>
-            <option value="Europe/Berlin">🇩🇪 Berlin / Paris (CET)</option>
-            <option value="Asia/Dubai">🇦🇪 Dubai (GST)</option>
-            <option value="Asia/Singapore">🇸🇬 Singapore (SGT)</option>
-            <option value="Asia/Tokyo">🇯🇵 Tokyo (JST)</option>
-            <option value="Asia/Manila">🇵🇭 Manila (PHT)</option>
-            <option value="Australia/Sydney">🇦🇺 Sydney (AEST)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Client Location</label>
-          <select id="tz2" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3.5 text-white focus:outline-none focus:border-blue-500">
-            <option value="America/New_York" selected>🇺🇸 New York (EST/EDT)</option>
-            <option value="Asia/Kolkata">🇮🇳 India (IST)</option>
-            <option value="America/Los_Angeles">🇺🇸 San Francisco (PST/PDT)</option>
-            <option value="America/Chicago">🇺🇸 Chicago (CST/CDT)</option>
-            <option value="America/Toronto">🇨🇦 Toronto (EST)</option>
-            <option value="America/Vancouver">🇨🇦 Vancouver (PST)</option>
-            <option value="Europe/London">🇬🇧 London (GMT/BST)</option>
-            <option value="Europe/Berlin">🇩🇪 Berlin / Paris (CET)</option>
-            <option value="Asia/Dubai">🇦🇪 Dubai (GST)</option>
-            <option value="Asia/Singapore">🇸🇬 Singapore (SGT)</option>
-            <option value="Asia/Tokyo">🇯🇵 Tokyo (JST)</option>
-            <option value="Asia/Manila">🇵🇭 Manila (PHT)</option>
-            <option value="Australia/Sydney">🇦🇺 Sydney (AEST)</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="overlap-result" class="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4 text-center">
-        <div id="overlap-text" class="text-base md:text-lg font-bold text-white">Calculating...</div>
-      </div>
-
-      <div class="mt-6 overflow-x-auto pb-2" id="timeline-container"></div>
-      
-      <button onclick="copySchedule()" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 transition text-white font-semibold py-3.5 rounded-xl flex items-center justify-center space-x-2">
-        <i class="fa-regular fa-copy"></i>
-        <span>Copy Schedule to Clipboard</span>
-      </button>
-    </div>
-
-    <!-- Monetization Section: Recommended Remote Work Tools -->
-    <div class="mt-12 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">⚡ Recommended Tools for Remote Work</h2>
-        <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Sponsored</span>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a href="https://zoom.us" target="_blank" rel="noopener noreferrer" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-blue-500 transition block">
-          <div class="font-semibold text-white">Zoom Meeting Pro</div>
-          <div class="text-xs text-slate-400 mt-1">Host seamless multi-timezone client calls.</div>
-        </a>
-        <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-blue-500 transition block">
-          <div class="font-semibold text-white">Calendly</div>
-          <div class="text-xs text-slate-400 mt-1">Eliminate scheduling back-and-forth forever.</div>
-        </a>
-        <a href="https://wise.prf.hn/click/camref:1101l436282/destination:https%3A%2F%2Fwise.com%2F" target="_blank" rel="noopener noreferrer sponsored" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-emerald-500 transition block">
-          <div class="font-semibold text-emerald-400">Wise Payments</div>
-          <div class="text-xs text-slate-400 mt-1">Receive international payments with real exchange rates.</div>
-        </a>
-      </div>
-    </div>
-
-    <!-- SEO Content Section: Popular Overlap Comparisons -->
-    <div id="popular-pairs" class="mt-12 space-y-8">
-      <div class="border-t border-slate-800 pt-8">
-        <h2 class="text-2xl font-bold text-white mb-4">Common Remote Work Timezone Comparisons</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
-          <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
-            <h3 class="font-semibold text-white mb-2">🇮🇳 IST to 🇺🇸 EST (New York / Toronto)</h3>
-            <p class="text-slate-400">The standard overlap occurs between <strong>6:30 PM to 9:30 PM IST</strong> (9:00 AM to 12:00 PM EST). Ideal for standups and handoff meetings.</p>
-          </div>
-          <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
-            <h3 class="font-semibold text-white mb-2">🇮🇳 IST to 🇬🇧 GMT (London)</h3>
-            <p class="text-slate-400">Overlap occurs between <strong>1:30 PM to 6:30 PM IST</strong> (8:00 AM to 1:00 PM GMT), providing a generous 5-hour real-time collaboration window.</p>
-          </div>
-          <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
-            <h3 class="font-semibold text-white mb-2">🇸🇬 SGT (Singapore) to 🇦🇺 AEST (Sydney)</h3>
-            <p class="text-slate-400">With only a 2 to 3-hour difference, teams in APAC share almost the complete workday (9:00 AM to 3:00 PM SGT).</p>
-          </div>
-          <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl">
-            <h3 class="font-semibold text-white mb-2">🇩🇪 CET (Berlin / Paris) to 🇺🇸 EST</h3>
-            <p class="text-slate-400">Overlap spans between <strong>3:00 PM to 6:00 PM CET</strong> (9:00 AM to 12:00 PM EST), suitable for European and US East Coast cross-collaboration.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ Section -->
-      <div class="border-t border-slate-800 pt-8">
-        <h2 class="text-2xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-        <div class="space-y-4 text-sm">
-          <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-xl">
-            <h4 class="font-semibold text-white">How does TimeOverlap determine working hours?</h4>
-            <p class="text-slate-400 mt-1">Standard business hours are defined between 9:00 AM and 6:00 PM local time for each selected region.</p>
-          </div>
-          <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-xl">
-            <h4 class="font-semibold text-white">Does this tool support Daylight Saving Time (DST)?</h4>
-            <p class="text-slate-400 mt-1">Yes, all calculations use native browser timezone specifications that automatically adjust for daylight saving changes.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Wise Affiliate CTA -->
-    <div class="mt-8 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 backdrop-blur-md text-center max-w-xl mx-auto mb-8">
-      <p class="text-sm font-medium text-slate-200">
-        Need to pay international clients or remote team members across these time zones?
+  <!-- Main App -->
+  <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full flex-grow">
+    <div class="text-center my-6 max-w-2xl mx-auto">
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
+        Find the <span class="text-brand-400">Best Meeting Time</span> for Everyone
+      </h1>
+      <p class="text-slate-400 mt-2 text-sm sm:text-base">
+        Date-aware DST calculation, multi-member intersection engine, and 1-click scheduling.
       </p>
-      <div class="mt-3">
-        <a
-          href="https://wise.prf.hn/click/camref:1101l436282/destination:https%3A%2F%2Fwise.com%2F"
-          target="_blank"
+    </div>
+
+    <!-- Planner Card -->
+    <div class="glass border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-2xl">
+      <div class="grid lg:grid-cols-[1fr_300px] gap-6">
+        
+        <!-- Left: Participants -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-white">Team Participants</h2>
+              <p class="text-xs text-slate-400">Set individual local working windows.</p>
+            </div>
+            <button 
+              id="addBtn" 
+              onclick="addParticipant()" 
+              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-brand-400 transition flex items-center gap-1.5"
+            >
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Person
+            </button>
+          </div>
+
+          <div id="participantsList" class="space-y-3"></div>
+          <p id="limitMsg" class="hidden mt-2 text-xs text-amber-400">Maximum 10 participants reached.</p>
+        </div>
+
+        <!-- Right: Meeting Settings -->
+        <aside class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 sm:p-5 h-fit">
+          <h3 class="font-bold text-sm text-slate-200 mb-4">Meeting Settings</h3>
+          
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Meeting Date</label>
+          <input 
+            type="date" 
+            id="meetingDate" 
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-brand-500"
+          />
+
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Duration</label>
+          <select 
+            id="meetingDuration" 
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-brand-500"
+          >
+            <option value="15">15 Minutes</option>
+            <option value="30">30 Minutes</option>
+            <option value="45">45 Minutes</option>
+            <option value="60" selected>60 Minutes (1 Hour)</option>
+            <option value="90">90 Minutes</option>
+            <option value="120">2 Hours</option>
+          </select>
+
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Team Preferred Bounds (Hours)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="prefStart" min="0" max="23" value="8" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-center text-white" />
+            <input type="number" id="prefEnd" min="1" max="24" value="22" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-center text-white" />
+          </div>
+          <p class="text-[10px] text-slate-500 mt-2">Filters out extremely early/late slots.</p>
+        </aside>
+      </div>
+
+      <!-- Scored Top 3 Meeting Slots -->
+      <div class="mt-8 pt-6 border-t border-slate-800/80">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-brand-400 mb-3">Top Recommended Meeting Windows</h3>
+        <div id="topSlotsContainer" class="grid md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-6 flex flex-wrap gap-2.5">
+        <button onclick="copySchedule()" class="flex-1 min-w-[150px] px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i class="fa-regular fa-copy"></i> Copy Schedule
+        </button>
+        <button onclick="shareLink()" class="flex-1 min-w-[150px] px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-link"></i> Share URL
+        </button>
+        <button onclick="createGoogleCal()" class="flex-1 min-w-[150px] px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i class="fa-brands fa-google"></i> Google Calendar
+        </button>
+        <button onclick="downloadICS()" class="flex-1 min-w-[150px] px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-download"></i> Download .ICS
+        </button>
+      </div>
+
+      <!-- Visual 24-Hour Overlap Grid -->
+      <div class="mt-8">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">24-Hour Overlap Timeline</h3>
+          <span class="text-[11px] text-slate-500">Green = All Members Available</span>
+        </div>
+        <div class="overflow-x-auto scrollbar border border-slate-800 rounded-2xl bg-slate-950/70 p-3">
+          <div id="timeline" class="timeline-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monetization Card -->
+    <div class="mt-10 rounded-2xl border border-slate-800 bg-slate-900/50 p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div>
+        <span class="text-[10px] uppercase tracking-wider text-brand-400 font-bold px-2 py-0.5 rounded bg-brand-500/10 border border-brand-500/20">Remote Work Tools</span>
+        <h2 class="text-lg font-bold text-white mt-1">Paying international clients or contractors?</h2>
+        <p class="text-xs text-slate-400 mt-1">Avoid high bank exchange markups. Send and receive funds at the real mid-market rate with Wise.</p>
+      </div>
+      <div class="flex flex-wrap gap-2.5">
+        <a 
+          href="https://wise.prf.hn/click/camref:1101l436282/destination:https%3A%2F%2Fwise.com%2F" 
+          target="_blank" 
           rel="noopener noreferrer sponsored"
-          class="inline-block px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all"
+          onclick="trackAffiliateClick('Wise Banner')"
+          class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs font-bold transition shadow-lg flex items-center gap-2"
         >
-          Send Money with Low Fees via Wise →
+          <span>Open Wise Account</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
         </a>
       </div>
     </div>
+
+    <!-- FAQ Section -->
+    <section class="mt-12 max-w-4xl">
+      <h2 class="text-xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+      <div class="space-y-3 text-xs">
+        <details class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+          <summary class="font-semibold cursor-pointer text-slate-200">How does TimeOverlap handle Daylight Saving Time (DST)?</summary>
+          <p class="text-slate-400 mt-2 leading-relaxed">Calculations are evaluated against the specific date selected using the browser's native IANA timezone database. Transitions in the US, UK, and Europe are automatically calculated.</p>
+        </details>
+        <details class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+          <summary class="font-semibold cursor-pointer text-slate-200">Is team data saved on any server?</summary>
+          <p class="text-slate-400 mt-2 leading-relaxed">No. All timeline intersections run client-side in your browser. Shareable links encode the configuration strictly in the URL hash/query string.</p>
+        </details>
+      </div>
+    </section>
   </main>
 
-  <!-- Footer with Legal Modal Link -->
-  <footer class="border-t border-slate-800 bg-slate-900/60 py-6 px-4 text-center text-xs text-slate-500 mt-16">
-    <p>© 2026 TimeOverlap. Visual Meeting Planner for Global Teams.</p>
-    <div class="mt-2 space-x-4">
-      <button onclick="togglePrivacyModal(true)" class="hover:text-slate-300 underline">Privacy Policy</button>
-      <span>•</span>
-      <span class="text-slate-600">Built for Remote Teams Worldwide</span>
-      <p class="text-[11px] text-slate-500 text-center mt-3">
-        Disclosure: Some links on this site are affiliate links. If you make a transfer or sign up through them, we may earn a commission at no extra cost to you.
-      </p>
+  <!-- Footer -->
+  <footer class="mt-14 border-t border-slate-800 bg-slate-950 py-8 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between gap-4">
+      <div>© 2026 TimeOverlap Pro. Built for global distributed teams.</div>
+      <div class="flex justify-center gap-4 text-slate-400">
+        <button onclick="openModal('privacy')" class="hover:text-white underline">Privacy Policy</button>
+        <button onclick="openModal('terms')" class="hover:text-white underline">Terms</button>
+        <button onclick="openModal('affiliate')" class="hover:text-white underline">Affiliate Disclosure</button>
+      </div>
     </div>
+    <p class="text-[11px] text-slate-600 max-w-2xl mx-auto mt-4 leading-relaxed">
+      Affiliate Disclosure: Some outgoing links on this site are tracking links (including Wise). We may earn an affiliate commission at zero extra cost to you.
+    </p>
   </footer>
 
-  <!-- Privacy Policy Modal -->
-  <div id="privacy-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6 text-slate-300 text-left">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white">Privacy Policy</h3>
-        <button onclick="togglePrivacyModal(false)" class="text-slate-400 hover:text-white text-xl">&times;</button>
+  <!-- Legal Modal -->
+  <div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 p-4 items-center justify-center">
+    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6">
+      <div class="flex justify-between items-center">
+        <h3 id="modalTitle" class="text-lg font-bold text-white"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
       </div>
-      <div class="space-y-3 text-xs leading-relaxed text-slate-400">
-        <p><strong>1. Information We Collect:</strong> TimeOverlap does not require user accounts or store personal schedules. Calculations are processed locally in your browser.</p>
-        <p><strong>2. Analytics:</strong> We use Google Analytics 4 to track anonymized website performance, visitor counts, and page engagement.</p>
-        <p><strong>3. Third-Party Links:</strong> Our site contains referral and sponsored tool links. Clicking external links subjects you to their respective privacy terms.</p>
-        <p><strong>4. Updates:</strong> Continued use of the website signifies acceptance of our standard usage policies.</p>
-      </div>
-      <button onclick="togglePrivacyModal(false)" class="mt-6 w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition">Close</button>
+      <div id="modalBody" class="text-xs text-slate-400 leading-relaxed mt-4"></div>
+      <button onclick="closeModal()" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs">Close</button>
     </div>
   </div>
 
+  <!-- JavaScript Application Engine -->
   <script>
-    const tz1Select = document.getElementById('tz1');
-    const tz2Select = document.getElementById('tz2');
-    const timelineContainer = document.getElementById('timeline-container');
-    const overlapText = document.getElementById('overlap-text');
-    const privacyModal = document.getElementById('privacy-modal');
+    const TIMEZONES = [
+      ["Asia/Kolkata", "🇮🇳 India — Kolkata / IST"],
+      ["America/New_York", "🇺🇸 New York — EST/EDT"],
+      ["America/Los_Angeles", "🇺🇸 San Francisco — PST/PDT"],
+      ["America/Chicago", "🇺🇸 Chicago — CST/CDT"],
+      ["America/Toronto", "🇨🇦 Toronto — EST/EDT"],
+      ["America/Vancouver", "🇨🇦 Vancouver — PST/PDT"],
+      ["Europe/London", "🇬🇧 London — GMT/BST"],
+      ["Europe/Berlin", "🇩🇪 Berlin / Paris — CET/CEST"],
+      ["Asia/Dubai", "🇦🇪 Dubai — GST"],
+      ["Asia/Singapore", "🇸🇬 Singapore — SGT"],
+      ["Asia/Tokyo", "🇯🇵 Tokyo — JST"],
+      ["Australia/Sydney", "🇦🇺 Sydney — AEST/AEDT"],
+      ["Asia/Manila", "🇵🇭 Manila — PHT"]
+    ];
 
-    function getHourInZone(date, timeZone) {
-      const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone,
-        hour: 'numeric',
-        hourCycle: 'h23'
-      }).formatToParts(date);
-      const hourPart = parts.find(p => p.type === 'hour');
-      return parseInt(hourPart.value, 10);
+    let state = {
+      participants: [
+        { id: 1, name: "You", zone: "Asia/Kolkata", start: 9, end: 18 },
+        { id: 2, name: "Client / Lead", zone: "America/New_York", start: 9, end: 17 }
+      ],
+      bestSlots: []
+    };
+
+    const participantsListEl = document.getElementById("participantsList");
+    const meetingDateEl = document.getElementById("meetingDate");
+    const durationEl = document.getElementById("meetingDuration");
+    const prefStartEl = document.getElementById("prefStart");
+    const prefEndEl = document.getElementById("prefEnd");
+
+    function pad(n) { return String(n).padStart(2, "0"); }
+    
+    // Set Default Today's Date
+    const today = new Date();
+    meetingDateEl.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m]);
     }
 
-    function updatePlanner() {
-      const tz1 = tz1Select.value;
-      const tz2 = tz2Select.value;
-      const now = new Date();
-      let row1Html = '<div class="flex gap-1 mb-2 min-w-[600px]">';
-      let row2Html = '<div class="flex gap-1 min-w-[600px]">';
-      let overlapCount = 0;
-
-      for (let i = 0; i < 24; i++) {
-        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), i, 0, 0));
-        const h1 = getHourInZone(d, tz1);
-        const h2 = getHourInZone(d, tz2);
+    function renderParticipants() {
+      participantsListEl.innerHTML = "";
+      state.participants.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = "bg-slate-950/70 border border-slate-800 rounded-xl p-3.5";
         
-        const isWork1 = (h1 >= 9 && h1 < 18);
-        const isWork2 = (h2 >= 9 && h2 < 18);
-        const isOverlap = isWork1 && isWork2;
+        const tzOptions = TIMEZONES.map(([val, label]) => 
+          `<option value="${val}" ${val === p.zone ? 'selected' : ''}>${label}</option>`
+        ).join("");
 
-        if (isOverlap) overlapCount++;
+        div.innerHTML = `
+          <div class="grid md:grid-cols-[1.2fr_2fr_80px_80px_36px] gap-2.5 items-end">
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Name</label>
+              <input type="text" value="${escapeHtml(p.name)}" oninput="updateParticipant(${p.id}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Timezone</label>
+              <select onchange="updateParticipant(${p.id}, 'zone', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">${tzOptions}</select>
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Start</label>
+              <input type="number" min="0" max="23" value="${p.start}" onchange="updateParticipant(${p.id}, 'start', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center text-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">End</label>
+              <input type="number" min="1" max="24" value="${p.end}" onchange="updateParticipant(${p.id}, 'end', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center text-white" />
+            </div>
+            <button onclick="removeParticipant(${p.id})" class="h-8 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs ${state.participants.length <= 2 ? 'opacity-30 cursor-not-allowed' : ''}" ${state.participants.length <= 2 ? 'disabled' : ''}>
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+        participantsListEl.appendChild(div);
+      });
 
-        const bg1 = isOverlap ? 'bg-emerald-500 text-slate-950 font-bold' : (isWork1 ? 'bg-blue-600/80 text-white' : 'bg-slate-800 text-slate-500');
-        const bg2 = isOverlap ? 'bg-emerald-500 text-slate-950 font-bold' : (isWork2 ? 'bg-blue-600/80 text-white' : 'bg-slate-800 text-slate-500');
+      calculateSchedule();
+    }
 
-        row1Html += `<div class="flex-1 py-2 text-center text-xs rounded ${bg1}">${h1}:00</div>`;
-        row2Html += `<div class="flex-1 py-2 text-center text-xs rounded ${bg2}">${h2}:00</div>`;
+    function addParticipant() {
+      if (state.participants.length >= 10) {
+        document.getElementById("limitMsg").classList.remove("hidden");
+        return;
       }
-
-      timelineContainer.innerHTML = row1Html + '</div>' + row2Html + '</div>';
-      overlapText.innerHTML = overlapCount > 0 
-        ? `🎉 Found <span class="text-emerald-400">${overlapCount} Hours</span> of Shared Overlap!`
-        : `⚠️ No direct standard 9-to-6 overlap found. Consider asynchronous handoffs.`;
+      state.participants.push({
+        id: Date.now(),
+        name: `Member ${state.participants.length + 1}`,
+        zone: "Europe/London",
+        start: 9,
+        end: 17
+      });
+      renderParticipants();
     }
 
-    function copySchedule() {
-      const scheduleSummary = `TimeOverlap Schedule:\n${tz1Select.options[tz1Select.selectedIndex].text} vs ${tz2Select.options[tz2Select.selectedIndex].text}\nCheck live times at: https://timeoverlap-pi.vercel.app`;
-      navigator.clipboard.writeText(scheduleSummary);
-      alert('Schedule details copied to clipboard!');
-    }
-
-    function togglePrivacyModal(show) {
-      if (show) {
-        privacyModal.classList.remove('hidden');
-      } else {
-        privacyModal.classList.add('hidden');
+    function removeParticipant(id) {
+      if (state.participants.length > 2) {
+        state.participants = state.participants.filter(p => p.id !== id);
+        document.getElementById("limitMsg").classList.add("hidden");
+        renderParticipants();
       }
     }
 
-    tz1Select.addEventListener('change', updatePlanner);
-    tz2Select.addEventListener('change', updatePlanner);
-    updatePlanner();
-  </script>
-</body>
-</html>
+    function updateParticipant(id, key, val) {
+      const p = state.participants.find(x => x.id === id);
+      if (p) {
+        p[key] = val;
+        calculateSchedule();
+      }
+    }
+
+    function zonedTimeToUtc(dateStr, hour, minute, zone) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const desiredUtc = Date.UTC(y, m - 1, d, hour, minute, 0);
+      let guess = new Date(desiredUtc);
+
+      for (let i = 0; i < 4; i++) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: zone, year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+        }).formatToParts(guess);
+        
+        const get = type => +parts.find(x => x.type === type).value;
+        const shownUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+        const diff = desiredUtc - shownUtc;
+        if (Math.abs(diff) < 1000) break;
+        guess = new Date(guess.getTime() + diff);
+      }
+      return guess;
+    }
+
+    function getLocalMinutes(utcDate, zone) {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: zone, hour: "numeric", minute: "numeric", hourCycle: "h23"
+      }).formatToParts(utcDate);
+      const h = +parts.find(x => x.type === "hour").value;
+      const m = +parts.find(x => x.type === "minute").value;
+      return h * 60 + m;
+    }
+
+    function formatTime(date, zone) {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: zone, hour: "numeric", minute: "2-digit", hour12: true
+      }).format(date);
+    }
+
+    function calculateSchedule() {
+      const dateStr = meetingDateEl.value;
+      const duration = parseInt(durationEl.value, 10);
+      const prefS = parseInt(prefStartEl.value, 10) * 60;
+      const prefE = parseInt(prefEndEl.value, 10) * 60;
+      
+      const candidateSlots = [];
+
+      // Scan full 24 hours at 15-minute resolution based on Participant 1
+      for (let m = 0; m < 24 * 60; m += 15) {
+        const startUtc = zonedTimeToUtc(dateStr, Math.floor(m / 60), m % 60, state.participants[0].zone);
+        const endUtc = new Date(startUtc.getTime() + duration * 60000);
+
+        let allAvailable = true;
+        
