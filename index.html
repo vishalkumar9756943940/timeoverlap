@@ -396,4 +396,185 @@
         const endUtc = new Date(startUtc.getTime() + duration * 60000);
 
         let allAvailable = true;
+                let slotScore = 100;
+
+        state.participants.forEach(p => {
+          const startMin = getLocalMinutes(startUtc, p.zone);
+          const endMin = getLocalMinutes(endUtc, p.zone);
+          const workStartMin = p.start * 60;
+          const workEndMin = p.end * 60;
+
+          if (startMin < workStartMin || endMin > workEndMin) {
+            allAvailable = false;
+          }
+
+          // Penalize late evening / early morning meetings
+          if (startMin < 8 * 60 || startMin >= 20 * 60) slotScore -= 20;
+          if (startMin < 6 * 60 || startMin >= 22 * 60) slotScore -= 40;
+        });
+
+        if (allAvailable) {
+          const p1Min = getLocalMinutes(startUtc, state.participants[0].zone);
+          const targetCenter = (prefS + prefE) / 2;
+          slotScore -= Math.abs(p1Min - targetCenter) * 0.03;
+          candidateSlots.push({ startUtc, endUtc, score: slotScore });
+        }
+      }
+
+      candidateSlots.sort((a, b) => b.score - a.score);
+      state.bestSlots = candidateSlots.slice(0, 3);
+
+      renderTopSlots();
+      renderTimeline();
+    }
+
+    function renderTopSlots() {
+      const container = document.getElementById("topSlotsContainer");
+      container.innerHTML = "";
+
+      if (state.bestSlots.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center text-xs text-red-300">
+            ⚠️ No complete shared overlap found for this date. Try wider working hours or shorter duration.
+          </div>
+        `;
+        return;
+      }
+
+      state.bestSlots.forEach((slot, idx) => {
+        const div = document.createElement("div");
+        div.className = `p-4 rounded-xl border transition ${idx === 0 ? 'bg-brand-500/10 border-brand-500/40' : 'bg-slate-900/60 border-slate-800'}`;
+        
+        const label = idx === 0 ? "⭐ Top Match" : `Option #${idx + 1}`;
+        const p1Time = `${formatTime(slot.startUtc, state.participants[0].zone)} – ${formatTime(slot.endUtc, state.participants[0].zone)}`;
+
+        const participantTimes = state.participants.map(p => 
+          `<div class="flex justify-between text-[11px] text-slate-400 mt-1"><span>${p.name}:</span><span class="text-slate-200 font-mono">${formatTime(slot.startUtc, p.zone)}</span></div>`
+        ).join("");
+
+        div.innerHTML = `
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[10px] font-bold uppercase ${idx === 0 ? 'text-brand-400' : 'text-slate-400'}">${label}</span>
+            <span class="text-[10px] text-slate-500">${durationEl.value} Min</span>
+          </div>
+          <div class="text-sm font-bold text-white">${p1Time}</div>
+          <div class="mt-2 pt-2 border-t border-slate-800/80">${participantTimes}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderTimeline() {
+      const dateStr = meetingDateEl.value;
+      let html = `<div class="font-bold text-[11px] text-slate-500 flex items-center">Local Hour</div>`;
+      for (let h = 0; h < 24; h++) html += `<div class="text-[10px] text-slate-500 text-center py-1 font-mono">${pad(h)}</div>`;
+
+      state.participants.forEach(p => {
+        html += `<div class="pr-2 py-2 truncate"><div class="font-semibold text-xs truncate text-slate-200">${escapeHtml(p.name)}</div><div class="text-[10px] text-slate-500 truncate">${escapeHtml(p.zone.split('/')[1] || p.zone)}</div></div>`;
+        for (let h = 0; h < 24; h++) {
+          const utc = zonedTimeToUtc(dateStr, h, 0, p.zone);
+          const localMin = getLocalMinutes(utc, p.zone);
+          const isWork = (localMin >= p.start * 60 && localMin < p.end * 60);
+          
+          const isOverlap = state.participants.every(x => {
+            const m = getLocalMinutes(utc, x.zone);
+            return m >= x.start * 60 && m < x.end * 60;
+          });
+
+          let cls = isOverlap ? "bg-brand-500 text-slate-950 font-bold" : (isWork ? "bg-blue-600/70 text-white" : "bg-slate-900 text-slate-600");
+          html += `<div class="h-8 rounded flex items-center justify-center text-[9px] font-mono ${cls}" title="${p.name} — ${Math.floor(localMin / 60)}:00">${Math.floor(localMin / 60)}</div>`;
+        }
+      });
+      document.getElementById("timeline").innerHTML = html;
+    }
+
+    function copySchedule() {
+      if (!state.bestSlots.length) return alert("No common meeting slot to copy.");
+      const slot = state.bestSlots[0];
+      const summary = `TimeOverlap Meeting Sync:\nDate: ${meetingDateEl.value}\nDuration: ${durationEl.value} Mins\n` +
+        state.participants.map(p => `${p.name} (${p.zone}): ${formatTime(slot.startUtc, p.zone)} – ${formatTime(slot.endUtc, p.zone)}`).join("\n") +
+        `\n\nPlanned at: https://timeoverlap-pi.vercel.app/`;
+      
+      navigator.clipboard.writeText(summary);
+      if (typeof gtag === 'function') gtag('event', 'copy_schedule');
+      alert("Meeting schedule copied to clipboard!");
+    }
+
+    function shareLink() {
+      const data = { p: state.participants, d: meetingDateEl.value, m: +durationEl.value, ps: +prefStartEl.value, pe: +prefEndEl.value };
+      const code = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+      const url = `${location.origin}${location.pathname}?s=${code}`;
+      navigator.clipboard.writeText(url);
+      if (typeof gtag === 'function') gtag('event', 'share_link');
+      alert("Shareable URL copied!");
+    }
+
+    function loadShare() {
+      const raw = new URLSearchParams(location.search).get("s");
+      if (!raw) return;
+      try {
+        const json = decodeURIComponent(escape(atob(raw.replaceAll("-", "+").replaceAll("_", "/"))));
+        const data = JSON.parse(json);
+        if (Array.isArray(data.p) && data.p.length) state.participants = data.p.slice(0, 10);
+        if (data.d) meetingDateEl.value = data.d;
+        if (data.m) durationEl.value = data.m;
+        if (Number.isFinite(data.ps)) prefStartEl.value = data.ps;
+        if (Number.isFinite(data.pe)) prefEndEl.value = data.pe;
+      } catch (e) {}
+    }
+
+    function createGoogleCal() {
+      if (!state.bestSlots.length) return alert("No common meeting slot available.");
+      const { startUtc, endUtc } = state.bestSlots[0];
+      const fmt = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Global Team Sync")}&dates=${fmt(startUtc)}/${fmt(endUtc)}&details=${encodeURIComponent("Planned via TimeOverlap Pro: https://timeoverlap-pi.vercel.app/")}`;
+      if (typeof gtag === 'function') gtag('event', 'calendar_click', { type: 'google' });
+      window.open(url, "_blank", "noopener");
+    }
+
+    function downloadICS() {
+      if (!state.bestSlots.length) return alert("No common slot available.");
+      const { startUtc, endUtc } = state.bestSlots[0];
+      const fmt = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+      const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TimeOverlap Pro//EN\r\nBEGIN:VEVENT\r\nUID:${Date.now()}@timeoverlap\r\nDTSTAMP:${fmt(new Date())}\r\nDTSTART:${fmt(startUtc)}\r\nDTEND:${fmt(endUtc)}\r\nSUMMARY:Global Team Sync\r\nDESCRIPTION:Planned with TimeOverlap Pro - https://timeoverlap-pi.vercel.app/\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+      const blob = new Blob([ics], { type: "text/calendar" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "team-meeting.ics"; a.click();
+      if (typeof gtag === 'function') gtag('event', 'calendar_click', { type: 'ics' });
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function trackAffiliateClick(placement) {
+      if (typeof gtag === 'function') gtag('event', 'affiliate_click', { partner: 'Wise', placement: placement });
+    }
+
+    function openModal(type) {
+      const titles = { privacy: "Privacy Policy", terms: "Terms of Service", affiliate: "Affiliate Disclosure" };
+      const bodies = {
+        privacy: "TimeOverlap Pro calculates schedule intersections client-side inside your browser. We never store meeting data, names, or working hours on external servers. Google Analytics 4 is used to monitor anonymized performance.",
+        terms: "This application is provided as an open scheduling utility. Please double-check meeting invites across mission-critical calendars.",
+        affiliate: "We partner with trusted service providers (including Wise). When you open accounts or transact through these referral links, we may receive compensation at zero extra charge to you."
+      };
+      document.getElementById("modalTitle").textContent = titles[type];
+      document.getElementById("modalBody").textContent = bodies[type];
+      document.getElementById("modal").classList.remove("hidden");
+      document.getElementById("modal").classList.add("flex");
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+      document.getElementById("modal").classList.remove("flex");
+    }
+
+    [meetingDateEl, durationEl, prefStartEl, prefEndEl].forEach(el => {
+      el.addEventListener("input", calculateSchedule);
+      el.addEventListener("change", calculateSchedule);
+    });
+
+    // Boot App
+    loadShare();
+    renderParticipants();
+  </script>
+</body>
+</html>
+
         
