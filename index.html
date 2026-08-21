@@ -6,9 +6,12 @@
   <meta name="google-site-verification" content="Pl9iq3h4Y-5LzkBll4F1PdcA_s5vTwuP1MA5Cl9v63g" />
   <meta name="description" content="Calculate real-time multi-timezone overlap for distributed teams. Date-aware DST converter, custom working hours, and calendar export." />
   <meta name="theme-color" content="#020617" />
+  <meta property="og:title" content="TimeOverlap Pro — Smart Global Team Meeting Planner" />
+  <meta property="og:description" content="Find the best shared meeting window across global time zones instantly." />
+  <meta property="og:type" content="website" />
   <title>TimeOverlap Pro — Smart Global Team Meeting Planner</title>
 
-  <!-- Google Analytics 4 -->
+  <!-- Google tag (gtag.js) - Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-63CJ1KW5CK"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -17,9 +20,20 @@
     gtag('config', 'G-63CJ1KW5CK');
   </script>
 
-  <!-- Tailwind CSS & Icons -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#34d399', 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
   <style>
     html { scroll-behavior: smooth; }
     body { background: #020617; }
@@ -28,6 +42,7 @@
     .timeline-grid { display: grid; grid-template-columns: 140px repeat(24, minmax(36px, 1fr)); min-width: 1040px; }
     .scrollbar::-webkit-scrollbar { height: 6px; }
     .scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+    @media(max-width: 640px) { .timeline-grid { grid-template-columns: 100px repeat(24, minmax(32px, 1fr)); } }
   </style>
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between font-sans antialiased">
@@ -37,25 +52,28 @@
     <div class="max-w-6xl mx-auto flex justify-between items-center">
       <a href="#" class="flex items-center gap-2">
         <span class="text-2xl">⚡</span>
-        <span class="text-xl font-black bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">TimeOverlap</span>
+        <span class="text-xl font-black bg-gradient-to-r from-blue-400 via-teal-300 to-brand-400 bg-clip-text text-transparent">TimeOverlap</span>
       </a>
-      <a 
-        href="https://wise.prf.hn/click/camref:1101l436282" 
-        target="_blank" 
-        rel="noopener noreferrer sponsored"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition"
-      >
-        <span>Pay Global Team (Wise)</span>
-        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-      </a>
+      <div class="flex items-center gap-3">
+        <a 
+          href="https://wise.prf.hn/click/camref:1101l436282" 
+          target="_blank" 
+          rel="noopener noreferrer sponsored"
+          onclick="trackAffiliateClick('Wise Header')"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs font-bold transition shadow-sm"
+        >
+          <span>Pay Global Team (Wise)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main App -->
   <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full flex-grow">
     <div class="text-center my-6 max-w-2xl mx-auto">
       <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
-        Find the <span class="text-emerald-400">Best Meeting Time</span> for Everyone
+        Find the <span class="text-brand-400">Best Meeting Time</span> for Everyone
       </h1>
       <p class="text-slate-400 mt-2 text-sm sm:text-base">
         Date-aware DST calculation, multi-member intersection engine, and 1-click scheduling.
@@ -76,7 +94,7 @@
             <button 
               id="addBtn" 
               onclick="addParticipant()" 
-              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-emerald-400 transition flex items-center gap-1.5"
+              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-brand-400 transition flex items-center gap-1.5"
             >
               <i class="fa-solid fa-plus text-[10px]"></i> Add Person
             </button>
@@ -86,7 +104,7 @@
           <p id="limitMsg" class="hidden mt-2 text-xs text-amber-400">Maximum 10 participants reached.</p>
         </div>
 
-        <!-- Right: Settings -->
+        <!-- Right: Meeting Settings -->
         <aside class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 sm:p-5 h-fit">
           <h3 class="font-bold text-sm text-slate-200 mb-4">Meeting Settings</h3>
           
@@ -94,13 +112,13 @@
           <input 
             type="date" 
             id="meetingDate" 
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-emerald-500"
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-brand-500"
           />
 
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Duration</label>
           <select 
             id="meetingDuration" 
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-emerald-500"
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white mb-4 focus:outline-none focus:border-brand-500"
           >
             <option value="15">15 Minutes</option>
             <option value="30">30 Minutes</option>
@@ -109,12 +127,19 @@
             <option value="90">90 Minutes</option>
             <option value="120">2 Hours</option>
           </select>
+
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Team Preferred Bounds (Hours)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="prefStart" min="0" max="23" value="8" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-center text-white" />
+            <input type="number" id="prefEnd" min="1" max="24" value="22" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-center text-white" />
+          </div>
+          <p class="text-[10px] text-slate-500 mt-2">Filters out extremely early/late slots.</p>
         </aside>
       </div>
 
-      <!-- Scored Top Slots -->
+      <!-- Scored Top 3 Meeting Slots -->
       <div class="mt-8 pt-6 border-t border-slate-800/80">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-3">Recommended Common Meeting Windows</h3>
+        <h3 class="text-sm font-bold uppercase tracking-wider text-brand-400 mb-3">Top Recommended Meeting Windows</h3>
         <div id="topSlotsContainer" class="grid md:grid-cols-3 gap-3"></div>
       </div>
 
@@ -134,11 +159,11 @@
         </button>
       </div>
 
-      <!-- Visual Overlap Timeline -->
+      <!-- Visual 24-Hour Overlap Grid -->
       <div class="mt-8">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">24-Hour Overlap Timeline (UTC)</h3>
-          <span class="text-[11px] text-slate-500">Green = Everyone Working</span>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">24-Hour Overlap Timeline</h3>
+          <span class="text-[11px] text-slate-500">Green = All Members Available</span>
         </div>
         <div class="overflow-x-auto scrollbar border border-slate-800 rounded-2xl bg-slate-950/70 p-3">
           <div id="timeline" class="timeline-grid"></div>
@@ -146,30 +171,71 @@
       </div>
     </div>
 
-    <!-- Monetization Section -->
+    <!-- Monetization Card -->
     <div class="mt-10 rounded-2xl border border-slate-800 bg-slate-900/50 p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
       <div>
-        <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Remote Work Payments</span>
-        <h2 class="text-lg font-bold text-white mt-1">Paying international contractors or clients?</h2>
-        <p class="text-xs text-slate-400 mt-1">Avoid costly bank markups. Send and receive money at the real exchange rate with Wise.</p>
+        <span class="text-[10px] uppercase tracking-wider text-brand-400 font-bold px-2 py-0.5 rounded bg-brand-500/10 border border-brand-500/20">Remote Work Tools</span>
+        <h2 class="text-lg font-bold text-white mt-1">Paying international clients or contractors?</h2>
+        <p class="text-xs text-slate-400 mt-1">Avoid high bank exchange markups. Send and receive funds at the real mid-market rate with Wise.</p>
       </div>
-      <a 
-        href="https://wise.prf.hn/click/camref:1101l436282" 
-        target="_blank" 
-        rel="noopener noreferrer sponsored"
-        class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition shadow-lg flex items-center gap-2"
-      >
-        <span>Open Wise Account</span>
-        <i class="fa-solid fa-arrow-right text-xs"></i>
-      </a>
+      <div class="flex flex-wrap gap-2.5">
+        <a 
+          href="https://wise.prf.hn/click/camref:1101l436282" 
+          target="_blank" 
+          rel="noopener noreferrer sponsored"
+          onclick="trackAffiliateClick('Wise Banner')"
+          class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs font-bold transition shadow-lg flex items-center gap-2"
+        >
+          <span>Open Wise Account</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+      </div>
     </div>
+
+    <!-- FAQ Section -->
+    <section class="mt-12 max-w-4xl">
+      <h2 class="text-xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+      <div class="space-y-3 text-xs">
+        <details class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+          <summary class="font-semibold cursor-pointer text-slate-200">How does TimeOverlap handle Daylight Saving Time (DST)?</summary>
+          <p class="text-slate-400 mt-2 leading-relaxed">Calculations are evaluated against the specific date selected using the browser's native IANA timezone database. Transitions in the US, UK, and Europe are automatically calculated.</p>
+        </details>
+        <details class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+          <summary class="font-semibold cursor-pointer text-slate-200">Is team data saved on any server?</summary>
+          <p class="text-slate-400 mt-2 leading-relaxed">No. All timeline intersections run client-side in your browser. Shareable links encode the configuration strictly in the URL hash/query string.</p>
+        </details>
+      </div>
+    </section>
   </main>
 
+  <!-- Footer -->
   <footer class="mt-14 border-t border-slate-800 bg-slate-950 py-8 px-4 text-center text-xs text-slate-500">
-    <p>© 2026 TimeOverlap Pro. Built for distributed teams.</p>
-    <p class="text-[11px] text-slate-600 mt-2">Affiliate Disclosure: Outgoing partner links (like Wise) may earn us a referral commission at zero extra cost to you.</p>
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between gap-4">
+      <div>© 2026 TimeOverlap Pro. Built for global distributed teams.</div>
+      <div class="flex justify-center gap-4 text-slate-400">
+        <button onclick="openModal('privacy')" class="hover:text-white underline">Privacy Policy</button>
+        <button onclick="openModal('terms')" class="hover:text-white underline">Terms</button>
+        <button onclick="openModal('affiliate')" class="hover:text-white underline">Affiliate Disclosure</button>
+      </div>
+    </div>
+    <p class="text-[11px] text-slate-600 max-w-2xl mx-auto mt-4 leading-relaxed">
+      Affiliate Disclosure: Some outgoing links on this site are tracking links (including Wise). We may earn an affiliate commission at zero extra cost to you.
+    </p>
   </footer>
 
+  <!-- Legal Modal -->
+  <div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 p-4 items-center justify-center">
+    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6">
+      <div class="flex justify-between items-center">
+        <h3 id="modalTitle" class="text-lg font-bold text-white"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+      <div id="modalBody" class="text-xs text-slate-400 leading-relaxed mt-4"></div>
+      <button onclick="closeModal()" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs">Close</button>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Engine -->
   <script>
     const TIMEZONES = [
       ["Asia/Kolkata", "🇮🇳 India — Kolkata / IST"],
@@ -177,16 +243,19 @@
       ["America/Los_Angeles", "🇺🇸 San Francisco — PST/PDT"],
       ["America/Chicago", "🇺🇸 Chicago — CST/CDT"],
       ["America/Toronto", "🇨🇦 Toronto — EST/EDT"],
+      ["America/Vancouver", "🇨🇦 Vancouver — PST/PDT"],
       ["Europe/London", "🇬🇧 London — GMT/BST"],
       ["Europe/Berlin", "🇩🇪 Berlin / Paris — CET/CEST"],
       ["Asia/Dubai", "🇦🇪 Dubai — GST"],
       ["Asia/Singapore", "🇸🇬 Singapore — SGT"],
-      ["Australia/Sydney", "🇦🇺 Sydney — AEST/AEDT"]
+      ["Asia/Tokyo", "🇯🇵 Tokyo — JST"],
+      ["Australia/Sydney", "🇦🇺 Sydney — AEST/AEDT"],
+      ["Asia/Manila", "🇵🇭 Manila — PHT"]
     ];
 
     let state = {
       participants: [
-        { id: 1, name: "You", zone: "Asia/Kolkata", start: 9, end: 18 },
+        { id: 1, name: "You", zone: "Asia/Kolkata", start: 9, end: 20 },
         { id: 2, name: "Client / Lead", zone: "America/New_York", start: 9, end: 17 }
       ],
       bestSlots: []
@@ -195,12 +264,21 @@
     const participantsListEl = document.getElementById("participantsList");
     const meetingDateEl = document.getElementById("meetingDate");
     const durationEl = document.getElementById("meetingDuration");
+    const prefStartEl = document.getElementById("prefStart");
+    const prefEndEl = document.getElementById("prefEnd");
 
+    function pad(n) { return String(n).padStart(2, "0"); }
+    
+    // Set Default Today's Date
     const today = new Date();
-    meetingDateEl.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    meetingDateEl.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m]);
+    }
         function renderParticipants() {
       participantsListEl.innerHTML = "";
-      state.participants.forEach(p => {
+      state.participants.forEach((p, idx) => {
         const div = document.createElement("div");
         div.className = "bg-slate-950/70 border border-slate-800 rounded-xl p-3.5";
         
@@ -212,19 +290,19 @@
           <div class="grid md:grid-cols-[1.2fr_2fr_80px_80px_36px] gap-2.5 items-end">
             <div>
               <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Name</label>
-              <input type="text" value="${p.name}" oninput="updateParticipant(${p.id}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" />
+              <input type="text" value="${escapeHtml(p.name)}" oninput="updateParticipant(${p.id}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500" />
             </div>
             <div>
               <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Timezone</label>
-              <select onchange="updateParticipant(${p.id}, 'zone', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">${tzOptions}</select>
+              <select onchange="updateParticipant(${p.id}, 'zone', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">${tzOptions}</select>
             </div>
             <div>
               <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Start</label>
-              <input type="number" min="0" max="23" value="${p.start}" onchange="updateParticipant(${p.id}, 'start', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-center text-white" />
+              <input type="number" min="0" max="23" value="${p.start}" onchange="updateParticipant(${p.id}, 'start', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center text-white" />
             </div>
             <div>
               <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">End</label>
-              <input type="number" min="1" max="24" value="${p.end}" onchange="updateParticipant(${p.id}, 'end', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-center text-white" />
+              <input type="number" min="1" max="24" value="${p.end}" onchange="updateParticipant(${p.id}, 'end', parseInt(this.value, 10))" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center text-white" />
             </div>
             <button onclick="removeParticipant(${p.id})" class="h-8 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs ${state.participants.length <= 2 ? 'opacity-30 cursor-not-allowed' : ''}" ${state.participants.length <= 2 ? 'disabled' : ''}>
               <i class="fa-solid fa-xmark"></i>
@@ -233,74 +311,148 @@
         `;
         participantsListEl.appendChild(div);
       });
+
       calculateSchedule();
     }
 
     function addParticipant() {
-      if (state.participants.length >= 10) return;
-      state.participants.push({ id: Date.now(), name: `Member ${state.participants.length + 1}`, zone: "Europe/London", start: 9, end: 17 });
+      if (state.participants.length >= 10) {
+        document.getElementById("limitMsg").classList.remove("hidden");
+        return;
+      }
+      state.participants.push({
+        id: Date.now(),
+        name: `Member ${state.participants.length + 1}`,
+        zone: "Europe/London",
+        start: 9,
+        end: 17
+      });
       renderParticipants();
     }
 
     function removeParticipant(id) {
       if (state.participants.length > 2) {
         state.participants = state.participants.filter(p => p.id !== id);
+        document.getElementById("limitMsg").classList.add("hidden");
         renderParticipants();
       }
     }
 
     function updateParticipant(id, key, val) {
       const p = state.participants.find(x => x.id === id);
-      if (p) { p[key] = val; calculateSchedule(); }
+      if (p) {
+        p[key] = val;
+        calculateSchedule();
+      }
     }
 
-    function getLocalMinuteOfDay(date, zone) {
-      const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: zone, hour: 'numeric', minute: 'numeric', hourCycle: 'h23'
-      }).formatToParts(date);
-      const h = parseInt(parts.find(p => p.type === 'hour').value, 10);
-      const m = parseInt(parts.find(p => p.type === 'minute').value, 10);
-      return h * 60 + m;
+    function zonedTimeToUtc(dateStr, hour, minute, zone) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const desiredUtc = Date.UTC(y, m - 1, d, hour, minute, 0);
+      let guess = new Date(desiredUtc);
+
+      for (let i = 0; i < 4; i++) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: zone, year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+        }).formatToParts(guess);
+        
+        const get = type => +parts.find(x => x.type === type).value;
+        const shownUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+        const diff = desiredUtc - shownUtc;
+        if (Math.abs(diff) < 1000) break;
+        guess = new Date(guess.getTime() + diff);
+      }
+      return guess;
+    }
+
+    function getLocalDateTimeParts(utcDate, zone) {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: zone,
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(utcDate);
+      const get = type => +parts.find(x => x.type === type).value;
+      return {
+        year: get("year"),
+        month: get("month"),
+        day: get("day"),
+        hour: get("hour"),
+        minute: get("minute"),
+        second: get("second")
+      };
+    }
+
+    function getLocalMinutes(utcDate, zone) {
+      const p = getLocalDateTimeParts(utcDate, zone);
+      return p.hour * 60 + p.minute;
+    }
+
+    function isWithinWorkingWindow(startUtc, endUtc, participant) {
+      const start = getLocalDateTimeParts(startUtc, participant.zone);
+      const end = getLocalDateTimeParts(endUtc, participant.zone);
+      const startMin = start.hour * 60 + start.minute;
+      const endMin = end.hour * 60 + end.minute;
+      const workStart = participant.start * 60;
+      const workEnd = participant.end * 60;
+
+      const sameLocalDate =
+        start.year === end.year &&
+        start.month === end.month &&
+        start.day === end.day;
+
+      return sameLocalDate &&
+        startMin >= workStart &&
+        endMin <= workEnd &&
+        endMin > startMin;
     }
 
     function formatTime(date, zone) {
-      return new Intl.DateTimeFormat('en-US', {
-        timeZone: zone, hour: 'numeric', minute: '2-digit', hour12: true
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: zone, hour: "numeric", minute: "2-digit", hour12: true
       }).format(date);
     }
 
     function calculateSchedule() {
-      const [y, m, d] = meetingDateEl.value.split('-').map(Number);
+      const dateStr = meetingDateEl.value;
       const duration = parseInt(durationEl.value, 10);
+      const prefS = parseInt(prefStartEl.value, 10) * 60;
+      const prefE = parseInt(prefEndEl.value, 10) * 60;
+      
       const candidateSlots = [];
 
-      // Scan UTC day in 15-minute intervals
-      for (let min = 0; min < 24 * 60; min += 15) {
-        const utcStart = new Date(Date.UTC(y, m - 1, d, Math.floor(min / 60), min % 60, 0));
-        const utcEnd = new Date(utcStart.getTime() + duration * 60000);
+      for (let m = 0; m < 24 * 60; m += 15) {
+        const startUtc = zonedTimeToUtc(dateStr, Math.floor(m / 60), m % 60, state.participants[0].zone);
+        const endUtc = new Date(startUtc.getTime() + duration * 60000);
 
         let allAvailable = true;
+        let slotScore = 100;
 
         state.participants.forEach(p => {
-          const sMin = getLocalMinuteOfDay(utcStart, p.zone);
-          const eMin = getLocalMinuteOfDay(utcEnd, p.zone);
-          const pStart = p.start * 60;
-          const pEnd = p.end * 60;
+          const startMin = getLocalMinutes(startUtc, p.zone);
 
-          // Check if meeting start & end are entirely inside person's working hours
-          if (sMin < pStart || eMin > pEnd || eMin < sMin) {
+          if (!isWithinWorkingWindow(startUtc, endUtc, p)) {
             allAvailable = false;
           }
+
+          if (startMin < 8 * 60 || startMin >= 20 * 60) slotScore -= 20;
+          if (startMin < 6 * 60 || startMin >= 22 * 60) slotScore -= 40;
         });
 
         if (allAvailable) {
-          candidateSlots.push({ utcStart, utcEnd });
+          const p1Min = getLocalMinutes(startUtc, state.participants[0].zone);
+          const targetCenter = (prefS + prefE) / 2;
+          slotScore -= Math.abs(p1Min - targetCenter) * 0.03;
+          candidateSlots.push({ startUtc, endUtc, score: slotScore });
         }
       }
 
+      candidateSlots.sort((a, b) => b.score - a.score);
       state.bestSlots = candidateSlots.slice(0, 3);
+
       renderTopSlots();
-      renderTimeline(y, m, d);
+      renderTimeline();
     }
 
     function renderTopSlots() {
@@ -309,8 +461,8 @@
 
       if (state.bestSlots.length === 0) {
         container.innerHTML = `
-          <div class="col-span-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center text-xs text-red-300">
-            ⚠️ No shared working overlap found on this date. Try wider working hours or shorter duration.
+          <div class="col-span-full p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center text-xs text-amber-300">
+            ⚠️ No overlap found. Tip: Extend working hours (e.g. up to 20:00 or 21:00) to bridge time zones.
           </div>
         `;
         return;
@@ -318,18 +470,18 @@
 
       state.bestSlots.forEach((slot, idx) => {
         const div = document.createElement("div");
-        div.className = `p-4 rounded-xl border transition ${idx === 0 ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-900/60 border-slate-800'}`;
+        div.className = `p-4 rounded-xl border transition ${idx === 0 ? 'bg-brand-500/10 border-brand-500/40' : 'bg-slate-900/60 border-slate-800'}`;
         
         const label = idx === 0 ? "⭐ Top Match" : `Option #${idx + 1}`;
-        const p1Time = `${formatTime(slot.utcStart, state.participants[0].zone)} – ${formatTime(slot.utcEnd, state.participants[0].zone)}`;
+        const p1Time = `${formatTime(slot.startUtc, state.participants[0].zone)} – ${formatTime(slot.endUtc, state.participants[0].zone)}`;
 
         const participantTimes = state.participants.map(p => 
-          `<div class="flex justify-between text-[11px] text-slate-400 mt-1"><span>${p.name}:</span><span class="text-slate-200 font-mono">${formatTime(slot.utcStart, p.zone)}</span></div>`
+          `<div class="flex justify-between text-[11px] text-slate-400 mt-1"><span>${p.name}:</span><span class="text-slate-200 font-mono">${formatTime(slot.startUtc, p.zone)}</span></div>`
         ).join("");
 
         div.innerHTML = `
           <div class="flex justify-between items-center mb-1.5">
-            <span class="text-[10px] font-bold uppercase ${idx === 0 ? 'text-emerald-400' : 'text-slate-400'}">${label}</span>
+            <span class="text-[10px] font-bold uppercase ${idx === 0 ? 'text-brand-400' : 'text-slate-400'}">${label}</span>
             <span class="text-[10px] text-slate-500">${durationEl.value} Min</span>
           </div>
           <div class="text-sm font-bold text-white">${p1Time}</div>
@@ -339,64 +491,117 @@
       });
     }
 
-    function renderTimeline(y, m, d) {
-      let html = `<div class="font-bold text-[11px] text-slate-500 flex items-center">Participant</div>`;
-      for (let h = 0; h < 24; h++) html += `<div class="text-[10px] text-slate-500 text-center py-1 font-mono">${String(h).padStart(2, '0')}:00</div>`;
+    function renderTimeline() {
+      const dateStr = meetingDateEl.value;
+      let html = `<div class="font-bold text-[11px] text-slate-500 flex items-center">UTC Hour</div>`;
+      for (let h = 0; h < 24; h++) html += `<div class="text-[10px] text-slate-500 text-center py-1 font-mono">${pad(h)}</div>`;
 
-      state.participants.forEach(p => {
-        html += `<div class="pr-2 py-2 truncate"><div class="font-semibold text-xs text-slate-200">${p.name}</div><div class="text-[10px] text-slate-500">${p.zone.split('/')[1] || p.zone}</div></div>`;
+      for (const p of state.participants) {
+        html += `<div class="pr-2 py-2 truncate"><div class="font-semibold text-xs truncate text-slate-200">${escapeHtml(p.name)}</div><div class="text-[10px] text-slate-500 truncate">${escapeHtml(p.zone.split('/')[1] || p.zone)}</div></div>`;
         for (let h = 0; h < 24; h++) {
-          const testUtc = new Date(Date.UTC(y, m - 1, d, h, 0, 0));
-          const localMin = getLocalMinuteOfDay(testUtc, p.zone);
-          const isWork = (localMin >= p.start * 60 && localMin < p.end * 60);
-
-          const isSharedOverlap = state.participants.every(x => {
-            const m = getLocalMinuteOfDay(testUtc, x.zone);
-            return m >= x.start * 60 && m < x.end * 60;
+          const utc = new Date(Date.UTC(...dateStr.split('-').map(Number).map((v, i) => i === 1 ? v - 1 : v), h, 0, 0));
+          const local = getLocalDateTimeParts(utc, p.zone);
+          const localMin = local.hour * 60 + local.minute;
+          const isWork = localMin >= p.start * 60 && localMin < p.end * 60;
+          const isOverlap = state.participants.every(x => {
+            const xLocal = getLocalDateTimeParts(utc, x.zone);
+            const xMin = xLocal.hour * 60 + xLocal.minute;
+            return xMin >= x.start * 60 && xMin < x.end * 60;
           });
 
-          let cls = isSharedOverlap ? "bg-emerald-500 text-slate-950 font-bold" : (isWork ? "bg-blue-600/70 text-white" : "bg-slate-900 text-slate-600");
-          html += `<div class="h-8 rounded flex items-center justify-center text-[9px] font-mono ${cls}">${Math.floor(localMin / 60)}</div>`;
+          const cls = isOverlap
+            ? "bg-brand-500 text-slate-950 font-bold"
+            : (isWork ? "bg-blue-600/70 text-white" : "bg-slate-900 text-slate-600");
+          html += `<div class="h-8 rounded flex items-center justify-center text-[9px] font-mono ${cls}" title="${escapeHtml(p.name)} — ${formatTime(utc, p.zone)}">${formatTime(utc, p.zone)}</div>`;
         }
-      });
+      }
       document.getElementById("timeline").innerHTML = html;
     }
 
     function copySchedule() {
-      if (!state.bestSlots.length) return alert("No meeting slot found to copy.");
+      if (!state.bestSlots.length) return alert("No common meeting slot to copy.");
       const slot = state.bestSlots[0];
       const summary = `TimeOverlap Meeting Sync:\nDate: ${meetingDateEl.value}\nDuration: ${durationEl.value} Mins\n` +
-        state.participants.map(p => `${p.name} (${p.zone}): ${formatTime(slot.utcStart, p.zone)} – ${formatTime(slot.utcEnd, p.zone)}`).join("\n") +
+        state.participants.map(p => `${p.name} (${p.zone}): ${formatTime(slot.startUtc, p.zone)} – ${formatTime(slot.endUtc, p.zone)}`).join("\n") +
         `\n\nPlanned at: https://timeoverlap-pi.vercel.app/`;
+      
       navigator.clipboard.writeText(summary);
-      alert("Schedule details copied!");
+      if (typeof gtag === 'function') gtag('event', 'copy_schedule');
+      alert("Meeting schedule copied to clipboard!");
     }
 
     function shareLink() {
-      const data = { p: state.participants, d: meetingDateEl.value, m: +durationEl.value };
+      const data = { p: state.participants, d: meetingDateEl.value, m: +durationEl.value, ps: +prefStartEl.value, pe: +prefEndEl.value };
       const code = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
-      navigator.clipboard.writeText(`${location.origin}${location.pathname}?s=${code}`);
-      alert("Shareable link copied!");
+      const url = `${location.origin}${location.pathname}?s=${code}`;
+      navigator.clipboard.writeText(url);
+      if (typeof gtag === 'function') gtag('event', 'share_link');
+      alert("Shareable URL copied!");
+    }
+
+    function loadShare() {
+      const raw = new URLSearchParams(location.search).get("s");
+      if (!raw) return;
+      try {
+        const json = decodeURIComponent(escape(atob(raw.replaceAll("-", "+").replaceAll("_", "/"))));
+        const data = JSON.parse(json);
+        if (Array.isArray(data.p) && data.p.length) state.participants = data.p.slice(0, 10);
+        if (data.d) meetingDateEl.value = data.d;
+        if (data.m) durationEl.value = data.m;
+        if (Number.isFinite(data.ps)) prefStartEl.value = data.ps;
+        if (Number.isFinite(data.pe)) prefEndEl.value = data.pe;
+      } catch (e) {}
     }
 
     function createGoogleCal() {
       if (!state.bestSlots.length) return alert("No common meeting slot available.");
-      const { utcStart, utcEnd } = state.bestSlots[0];
+      const { startUtc, endUtc } = state.bestSlots[0];
       const fmt = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
-      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Global Team Sync")}&dates=${fmt(utcStart)}/${fmt(utcEnd)}&details=${encodeURIComponent("Planned via TimeOverlap Pro: https://timeoverlap-pi.vercel.app/")}`;
-      window.open(url, "_blank");
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Global Team Sync")}&dates=${fmt(startUtc)}/${fmt(endUtc)}&details=${encodeURIComponent("Planned via TimeOverlap Pro: https://timeoverlap-pi.vercel.app/")}`;
+      if (typeof gtag === 'function') gtag('event', 'calendar_click', { type: 'google' });
+      window.open(url, "_blank", "noopener");
     }
 
     function downloadICS() {
-      if (!state.bestSlots.length) return alert("No slot available.");
-      const { utcStart, utcEnd } = state.bestSlots[0];
+      if (!state.bestSlots.length) return alert("No common slot available.");
+      const { startUtc, endUtc } = state.bestSlots[0];
       const fmt = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
-      const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TimeOverlap Pro//EN\r\nBEGIN:VEVENT\r\nUID:${Date.now()}@timeoverlap\r\nDTSTAMP:${fmt(new Date())}\r\nDTSTART:${fmt(utcStart)}\r\nDTEND:${fmt(utcEnd)}\r\nSUMMARY:Global Team Sync\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+      const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TimeOverlap Pro//EN\r\nBEGIN:VEVENT\r\nUID:${Date.now()}@timeoverlap\r\nDTSTAMP:${fmt(new Date())}\r\nDTSTART:${fmt(startUtc)}\r\nDTEND:${fmt(endUtc)}\r\nSUMMARY:Global Team Sync\r\nDESCRIPTION:Planned with TimeOverlap Pro - https://timeoverlap-pi.vercel.app/\r\nEND:VEVENT\r\nEND:VCALENDAR`;
       const blob = new Blob([ics], { type: "text/calendar" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "team-meeting.ics"; a.click();
+      if (typeof gtag === 'function') gtag('event', 'calendar_click', { type: 'ics' });
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
 
-    [meetingDateEl, durationEl].forEach(el => el.addEventListener("change", calculateSchedule));
+    function trackAffiliateClick(placement) {
+      if (typeof gtag === 'function') gtag('event', 'affiliate_click', { partner: 'Wise', placement: placement });
+    }
+
+    function openModal(type) {
+      const titles = { privacy: "Privacy Policy", terms: "Terms of Service", affiliate: "Affiliate Disclosure" };
+      const bodies = {
+        privacy: "TimeOverlap Pro calculates schedule intersections client-side inside your browser. We never store meeting data, names, or working hours on external servers. Google Analytics 4 is used to monitor anonymized performance.",
+        terms: "This application is provided as an open scheduling utility. Please double-check meeting invites across mission-critical calendars.",
+        affiliate: "We partner with trusted service providers (including Wise). When you open accounts or transact through these referral links, we may receive compensation at zero extra charge to you."
+      };
+      document.getElementById("modalTitle").textContent = titles[type];
+      document.getElementById("modalBody").textContent = bodies[type];
+      document.getElementById("modal").classList.remove("hidden");
+      document.getElementById("modal").classList.add("flex");
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+      document.getElementById("modal").classList.remove("flex");
+    }
+
+    [meetingDateEl, durationEl, prefStartEl, prefEndEl].forEach(el => {
+      el.addEventListener("input", calculateSchedule);
+      el.addEventListener("change", calculateSchedule);
+    });
+
+    // Boot App
+    loadShare();
     renderParticipants();
   </script>
 </body>
